@@ -10,13 +10,9 @@ namespace Domain.Models
     {
         public DbSet<Hall> Halls { get; set; }
         public DbSet<Row> Rows { get; set; }
-        public DomainContext()
-        {
-            Database.EnsureCreated();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=domaindb;Trusted_Connection=True;");
-        }
+        public DomainContext(DbContextOptions<DomainContext> options)
+            :base(options)
+        {            
+        }       
     }
 }
