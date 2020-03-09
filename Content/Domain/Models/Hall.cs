@@ -9,6 +9,7 @@ namespace Domain.Models
     {
         public int HallId { get; set; }
         public string Name { get; set; }
+        public bool Reconstruction { get; set; }
 
         public List<Row> Rows { get; set; }
     }
