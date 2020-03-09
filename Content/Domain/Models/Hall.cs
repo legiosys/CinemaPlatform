@@ -7,19 +7,19 @@ namespace Domain.Models
 {
     public class Hall
     {
-        public int HallId { get; private set; }
-        public string Name { get; private set; }
-        public bool Reconstruction { get; private set; }
+        public int HallId { get; set; }
+        public string Name { get; set; }
+        public bool Reconstruction { get; set; }
 
-        public List<Row> Rows { get; private set; }
+        public List<Row> Rows { get; set; }
 
-        private Hall() { }
-        public Hall(int id, string name, bool reconstruction, List<Row> rows)
-        {
-            HallId = id;
-            Name = name;
-            Reconstruction = reconstruction;
-            Rows = rows ?? new List<Row>();
-        }
+        //private Hall() { }
+        //public Hall(int id, string name, bool reconstruction, List<Row> rows)
+        //{
+        //    HallId = id;
+        //    Name = name;
+        //    Reconstruction = reconstruction;
+        //    Rows = rows ?? new List<Row>();
+        //}
     }
 }
