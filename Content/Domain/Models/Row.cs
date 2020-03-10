@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Domain.Models
 {
@@ -10,8 +11,9 @@ namespace Domain.Models
         public int RowId { get; set; }
         public char Letter { get; set; }
         public int Seats { get; set; } 
-
+        [JsonIgnore]
         public int HallId { get; set; }
+        [JsonIgnore]
         public Hall Hall { get; set; }
 
         //private Row() { }
