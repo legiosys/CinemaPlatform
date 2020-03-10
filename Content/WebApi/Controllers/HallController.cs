@@ -20,14 +20,14 @@ namespace WebApi.Controllers
             _context = context;
         }
 
-        // GET: api/Halls
-        [HttpGet]
+        // GET: Hall/All
+        [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<Hall>>> GetHalls()
         {
             return await _context.Halls.ToListAsync();
         }
 
-        // GET: api/Halls/5
+        // GET: Hall/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Hall>> GetHall(int id)
         {
@@ -41,36 +41,23 @@ namespace WebApi.Controllers
             return hall;
         }
 
-        // PUT: api/Halls/5
+        // PUT: api/Halls/5 Hall hall
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutHall(int id, Hall hall)
+        [HttpPut]
+        public async Task<ActionResult<int>> PutHall(JsonHall hall)
         {
-            if (id != hall.HallId)
-            {
-                return BadRequest();
-            }
+            Console.WriteLine(hall.Name);
+            //_context.Halls.Add(hall);
+            await _context.SaveChangesAsync();
+            return 1;//hall.HallId;
+        }
 
-            _context.Entry(hall).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!HallExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+        public class JsonHall
+        {
+            public string Name { get; set; }
+            public bool Reconstruction { get; set; }
+            public IEnumerable<Row> Rows { get; set; }
         }
 
         // POST: api/Halls
