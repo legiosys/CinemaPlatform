@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<Hall>>> GetHalls()
         {
-            return await _context.Halls.ToListAsync();
+            return await _context.Halls.Include(hall => hall.Rows).ToListAsync();
         }
 
         // GET: Hall/5
@@ -45,20 +45,14 @@ namespace WebApi.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut]
-        public async Task<ActionResult<int>> PutHall(JsonHall hall)
+        public async Task<ActionResult<int>> PutHall(Hall.Json jsonhall)
         {
-            Console.WriteLine(hall.Name);
-            //_context.Halls.Add(hall);
+            Hall hall = new Hall(jsonhall);
+            _context.Halls.Add(hall);
             await _context.SaveChangesAsync();
-            return 1;//hall.HallId;
+            return hall.HallId;
         }
 
-        public class JsonHall
-        {
-            public string Name { get; set; }
-            public bool Reconstruction { get; set; }
-            public IEnumerable<Row> Rows { get; set; }
-        }
 
         // POST: api/Halls
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
