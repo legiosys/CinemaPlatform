@@ -41,15 +41,23 @@ namespace WebApi.Controllers
             return hall;
         }
 
-        // PUT: api/Halls/5
+        // PUT: api/Halls/5 Hall hall
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut]
-        public async Task<ActionResult<int>> PutHall(Hall hall)
+        public async Task<ActionResult<int>> PutHall(JsonHall hall)
         {
-            _context.Halls.Add(hall);
+            Console.WriteLine(hall.Name);
+            //_context.Halls.Add(hall);
             await _context.SaveChangesAsync();
-            return hall.HallId;
+            return 1;//hall.HallId;
+        }
+
+        public class JsonHall
+        {
+            public string Name { get; set; }
+            public bool Reconstruction { get; set; }
+            public IEnumerable<Row> Rows { get; set; }
         }
 
         // POST: api/Halls
