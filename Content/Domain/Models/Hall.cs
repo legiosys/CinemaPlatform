@@ -13,13 +13,19 @@ namespace Domain.Models
 
         public List<Row> Rows { get; set; }
 
-        //private Hall() { }
-        //public Hall(int id, string name, bool reconstruction, List<Row> rows)
-        //{
-        //    HallId = id;
-        //    Name = name;
-        //    Reconstruction = reconstruction;
-        //    Rows = rows ?? new List<Row>();
-        //}
+        private Hall() { }
+        public Hall(Json hall)
+        {
+            Name = hall.Name;
+            Reconstruction = hall.Reconstruction;           
+            Rows = new List<Row>(hall.Rows);
+        }
+
+        public class Json
+        {
+            public string Name { get; set; }
+            public bool Reconstruction { get; set; }
+            public IEnumerable<Row> Rows { get; set; }
+        }
     }
 }
