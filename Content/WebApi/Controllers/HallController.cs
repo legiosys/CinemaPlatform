@@ -31,8 +31,8 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hall>> GetHall(int id)
         {
-            var hall = await _context.Halls.FindAsync(id);
-
+            var hall = await _context.Halls.Include(hall => hall.Rows).FirstOrDefaultAsync(h => h.HallId == id);
+            
             if (hall == null)
             {
                 return NotFound();
