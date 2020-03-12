@@ -21,6 +21,17 @@ namespace Domain.Models
             Rows = new List<Row>(hall.Rows);
         }
 
+        public void CloseForReconstruction()
+        {
+            this.Reconstruction = true;
+        }
+
+        public void OpenAfterReconstruction(Json hall)
+        {
+            this.Name = hall.Name;
+            this.Reconstruction = false;
+        }
+
         public class Json
         {
             public string Name { get; set; }
