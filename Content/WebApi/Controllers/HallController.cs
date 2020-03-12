@@ -31,7 +31,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hall>> GetHall(int id)
         {
-            var hall = await _context.Halls.Include(hall => hall.Rows).FirstOrDefaultAsync(h => h.HallId == id);
+            var hall = await GetHallWithDependencies(id);
             
             if (hall == null)
             {
@@ -52,36 +52,36 @@ namespace WebApi.Controllers
         }
 
 
-        // POST: Hall/AddRow
-        [HttpPost("AddRow")]
-        public async Task<ActionResult<Hall>> AddRow(Hall hall)
+        // POST: Hall/5/AddRow || Hall/5/ChangeRow
+        [HttpPost("{id}/AddRow")]
+        [HttpPost("{id}/ChangeRow")]
+        public async Task<ActionResult<Row>> AddOrChangeRow(int id, Row row)
         {
-            _context.Halls.Add(hall);
+            Hall hall = await GetHallWithDependencies(id);
+            if (hall == null)
+            {
+                return NotFound();
+            }
+            hall.AddOrChangeRow(row);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
+            return Ok();
         }
 
 
-        // POST: Hall/RemoveRow
-        [HttpPost("RemoveRow")]
-        public async Task<ActionResult<Hall>> RemoveRow(Hall hall)
+        // POST: Hall/5/RemoveRow
+        [HttpPost("{id}/RemoveRow")]
+        public async Task<ActionResult<Row>> RemoveRow(int id, Row row)
         {
-            _context.Halls.Add(hall);
+            Hall hall = await GetHallWithDependencies(id);
+            if (hall == null)
+            {
+                return NotFound();
+            }
+            hall.RemoveRow(row);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
-        }
-
-
-        // POST: Hall/ChangeRow
-        [HttpPost("ChangeRow")]
-        public async Task<ActionResult<Hall>> ChangeRow(Hall hall)
-        {
-            _context.Halls.Add(hall);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
+            return Ok();
         }
 
 
@@ -98,7 +98,6 @@ namespace WebApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
-                //CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
         }
 
 
@@ -118,25 +117,9 @@ namespace WebApi.Controllers
         }
 
 
-        // DELETE: api/Halls/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Hall>> DeleteHall(int id)
+        private Task<Hall> GetHallWithDependencies(int id)
         {
-            var hall = await _context.Halls.FindAsync(id);
-            if (hall == null)
-            {
-                return NotFound();
-            }
-
-            _context.Halls.Remove(hall);
-            await _context.SaveChangesAsync();
-
-            return hall;
-        }
-
-        private bool HallExists(int id)
-        {
-            return _context.Halls.Any(e => e.HallId == id);
+            return _context.Halls.Include(hall => hall.Rows).FirstOrDefaultAsync(h => h.HallId == id);
         }
     }
 }
