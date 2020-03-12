@@ -87,23 +87,34 @@ namespace WebApi.Controllers
 
         // POST: Hall/CloseForReconstruction
         [HttpPost("CloseForReconstruction")]
-        public async Task<ActionResult<Hall>> CloseForReconstruction(Hall hall)
+        public async Task<ActionResult<Hall>> CloseForReconstruction(Hall.Json jsonhall)
         {
-            _context.Halls.Add(hall);
+            Hall hall = await _context.Halls.FindAsync(jsonhall.Id);
+            if (hall == null)
+            {
+                return NotFound();
+            }
+            hall.CloseForReconstruction();
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
+            return Ok();
+                //CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
         }
 
 
         // POST: Hall/OpenAfterReconstruction
         [HttpPost("OpenAfterReconstruction")]
-        public async Task<ActionResult<Hall>> OpenAfterReconstruction(Hall hall)
+        public async Task<ActionResult<Hall>> OpenAfterReconstruction(Hall.Json jsonhall)
         {
-            _context.Halls.Add(hall);
+            Hall hall = await _context.Halls.FindAsync(jsonhall.Id);
+            if (hall == null)
+            {
+                return NotFound();
+            }
+            hall.OpenAfterReconstruction(jsonhall);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetHall", new { id = hall.HallId }, hall);
+            return Ok();
         }
 
 
