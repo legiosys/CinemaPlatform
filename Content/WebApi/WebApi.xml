@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebApi</name>
+    </assembly>
+    <members>
+        <member name="M:WebApi.Controllers.HallController.GetHalls">
+            <summary>
+            Shows all halls
+            </summary>
+            <returns>List of halls</returns>
+        </member>
+    </members>
+</doc>

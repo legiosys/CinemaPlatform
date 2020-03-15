@@ -9,6 +9,7 @@ using Domain.Models;
 
 namespace WebApi.Controllers
 {
+    [Produces("application/json")]
     [Route("[controller]")]
     [ApiController]
     public class HallController : ControllerBase
@@ -20,14 +21,50 @@ namespace WebApi.Controllers
             _context = context;
         }
 
-        // GET: Hall/All Show all halls
+        /// <summary>Creates new hall</summary>
+        /// <remarks>Sample request: 
+        /// 
+        ///     PUT /Hall
+        ///     {
+        ///        "Name": "First hall",
+        ///        "Rows": [{
+        ///             "Letter": "A",
+        ///             "Seats" : 20
+        ///        },
+        ///        {
+        ///             "Letter": "B",
+        ///             "Seats": 25
+        ///        }]
+        ///     }
+        ///     
+        /// </remarks>
+        /// <returns>A newly created Hall id</returns>
+        [HttpPut]
+        public async Task<ActionResult<int>> PutHall(Hall.Json jsonhall)
+        {
+            Hall hall = new Hall(jsonhall);
+            _context.Halls.Add(hall);
+            await _context.SaveChangesAsync();
+            return hall.HallId;
+        }
+
+        /// <summary>Shows all halls</summary>
+        /// <remarks>Sample request: GET /Hall/All</remarks>
+        /// <returns>List of halls</returns>
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<Hall>>> GetHalls()
         {
             return await _context.Halls.Include(hall => hall.Rows).ToListAsync();
         }
 
-        // GET: Hall/5 Show concrete hall
+        /// <summary>Shows hall</summary>
+        /// <remarks>Sample request: 
+        /// 
+        ///     GET /Hall/1
+        ///     
+        /// </remarks>
+        /// <param name="id">ID of Hall</param>
+        /// <returns>Hall</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Hall>> GetHall(int id)
         {
@@ -41,17 +78,7 @@ namespace WebApi.Controllers
             return hall;
         }
 
-        // PUT: Hall/5 Creating new hall
-        [HttpPut]
-        public async Task<ActionResult<int>> PutHall(Hall.Json jsonhall)
-        {
-            Hall hall = new Hall(jsonhall);
-            _context.Halls.Add(hall);
-            await _context.SaveChangesAsync();
-            return hall.HallId;
-        }
-
-
+        
         // POST: Hall/5/AddRow || Hall/5/ChangeRow
         [HttpPost("{id}/AddRow")]
         [HttpPost("{id}/ChangeRow")]
