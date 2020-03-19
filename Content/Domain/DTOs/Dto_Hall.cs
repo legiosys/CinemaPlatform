@@ -6,7 +6,7 @@ namespace Domain.DTOs
 {
     public class Dto_Hall
     {
-        public int Id { get; set; }
+        public int HallId { get; set; }
         public string Name { get; set; }
         public bool Reconstruction { get; set; }
         public IEnumerable<Dto_Row> Rows { get; set; }
@@ -14,7 +14,7 @@ namespace Domain.DTOs
         public Dto_Hall() { }
         public Dto_Hall(int id, string name, bool reconstruction, IEnumerable<Dto_Row> rows)
         {
-            Id = id;
+            HallId = id;
             Name = name;
             Reconstruction = reconstruction;
             Rows = rows;
@@ -29,12 +29,12 @@ namespace Domain.DTOs
 
     public class Dto_OpenAfterRec_Hall
     {
-        public int Id { get; set; }
+        public int HallId { get; set; }
         public string Name { get; set; }
     }
 
     public class Dto_CloseForRec_Hall
     {
-        public int Id { get; set; }
+        public int HallId { get; set; }
     }
 }

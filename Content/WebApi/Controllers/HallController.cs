@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Domain.DTOs;
+using Domain.Exceptions;
 
 namespace WebApi.Controllers
 {
@@ -40,6 +41,7 @@ namespace WebApi.Controllers
         ///     
         /// </remarks>
         /// <returns>A newly created Hall id</returns>
+        /// <response code="400">Bad input parameters</response>
         [HttpPut]
         public async Task<int> PutHall(Dto_AddNew_Hall dtohall)
         {
@@ -72,6 +74,7 @@ namespace WebApi.Controllers
         /// </remarks>
         /// <param name="id">ID of Hall</param>
         /// <returns>Hall</returns>
+        /// <response code="404">Hall with {HallId} not found</response>
         [HttpGet("{id}")]
         public async Task<Dto_Hall> GetHall(int id)
         {
@@ -90,14 +93,17 @@ namespace WebApi.Controllers
         ///     
         /// </remarks>
         /// <returns></returns>
+        /// <response code="200">Changes applied</response>
+        /// <response code="400">Bad input parameters</response>
+        /// <response code="404">Hall with {HallId} not found</response>
         [HttpPost("AddRow")]
         [HttpPost("ChangeRow")]
-        public async Task<int> AddOrChangeRow(Dto_AddEdit_Row row)
+        public async Task<ActionResult<int>> AddOrChangeRow(Dto_AddEdit_Row row)
         {
             Hall hall = await GetHallWithDependencies(row.HallId);
             hall.AddOrChangeRow(row.Letter,row.Seats);
             await _context.SaveChangesAsync();
-            return hall.HallId;
+            return Ok();
         }
 
         /// <summary>Removes row of the hall</summary>
@@ -109,13 +115,16 @@ namespace WebApi.Controllers
         ///     
         /// </remarks>
         /// <returns></returns>
+        /// <response code="200">Changes applied</response>
+        /// <response code="400">Bad input parameters</response>
+        /// <response code="404">Hall with {HallId}  or Row{Letter} not found</response>
         [HttpPost("RemoveRow")]
-        public async Task<int> RemoveRow(Dto_Remove_Row row)
+        public async Task<ActionResult<int>> RemoveRow(Dto_Remove_Row row)
         {
             Hall hall = await GetHallWithDependencies(row.HallId);
             hall.RemoveRow(row.Letter);
             await _context.SaveChangesAsync();
-            return hall.HallId;
+            return Ok();
         }
 
         /// <summary>Closes hall for reconstruction</summary>
@@ -127,13 +136,16 @@ namespace WebApi.Controllers
         ///     
         /// </remarks>
         /// <returns></returns>
+        /// <response code="200">Changes applied</response>
+        /// <response code="400">Bad input parameters</response>
+        /// <response code="404">Hall with {HallId} not found</response>
         [HttpPost("CloseForReconstruction")]
-        public async Task<int> CloseForReconstruction(Dto_CloseForRec_Hall dtohall)
+        public async Task<ActionResult<int>> CloseForReconstruction(Dto_CloseForRec_Hall dtohall)
         {
-            Hall hall = await GetHallWithDependencies(dtohall.Id);
+            Hall hall = await GetHallWithDependencies(dtohall.HallId);
             hall.CloseForReconstruction();
             await _context.SaveChangesAsync();
-            return hall.HallId;
+            return Ok();
         }
 
         /// <summary>Opens hall after reconstruction</summary>
@@ -146,13 +158,16 @@ namespace WebApi.Controllers
         ///     
         /// </remarks>
         /// <returns></returns>
+        /// <response code="200">Changes applied</response>
+        /// <response code="400">Bad input parameters</response>
+        /// <response code="404">Hall with {HallId} not found</response>
         [HttpPost("OpenAfterReconstruction")]
-        public async Task<int> OpenAfterReconstruction(Dto_OpenAfterRec_Hall dtohall)
+        public async Task<ActionResult<int>> OpenAfterReconstruction(Dto_OpenAfterRec_Hall dtohall)
         {
-            Hall hall = await GetHallWithDependencies(dtohall.Id);
+            Hall hall = await GetHallWithDependencies(dtohall.HallId);
             hall.OpenAfterReconstruction(dtohall.Name);
             await _context.SaveChangesAsync();
-            return hall.HallId;
+            return Ok();
         }
 
 
@@ -163,8 +178,9 @@ namespace WebApi.Controllers
 
         private async Task<Hall> GetHallWithDependencies(int id)
         {
-            if(id < 1) throw new ArgumentNullException("ID is null!");
-            return (await GetHallsWithDependencies()).FirstOrDefault(h => h.HallId == id);
+            var hall = (await GetHallsWithDependencies()).FirstOrDefault(h => h.HallId == id);
+            if (hall == null ) throw new NotFoundException("Hall doesn't exist!", $"HallId:{id}");
+            return hall;
         }
         
         private IEnumerable<Dto_Row> GetHallRows(List<Row> rows)

@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Domain.Models;
 using System.IO;
+using WebApi.Middlewares;
 
 namespace WebApi
 {
@@ -57,6 +58,7 @@ namespace WebApi
 
             app.UseAuthorization();
 
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

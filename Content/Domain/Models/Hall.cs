@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.DTOs;
+using Domain.Exceptions;
 
 
 namespace Domain.Models
@@ -18,35 +18,30 @@ namespace Domain.Models
         private Hall() { }
         public Hall(string name,List<Row> rows)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("'Name' argument is null!");
+            if (string.IsNullOrWhiteSpace(name)) throw new BadArgumentException("Argument is null!","Hall name");
             Name = name;
             Reconstruction = false;
-            //if (rows.Count() == 0) throw new ArgumentNullException("Hall should contain one or more Rows!");
+            //if (rows.Count() == 0) throw new BadArgumentException("Hall should contain one or more Rows!","Rows");
             Rows = rows;
         }
 
-        //static public List<Dto_Hall> ToDtoList(List<Hall> halls)
-        //{
-        //    var dtos = new List<Dto_Hall>();
-        //    //halls.ForEach(dtos.Add)
-        //}
-
         public void CloseForReconstruction()
         {
-            if (Reconstruction) throw new InvalidOperationException("Hall is already on reconstruction.");
+            if (Reconstruction) throw new BadArgumentException("Hall is already on reconstruction.", $"HallId:{HallId}");
             Reconstruction = true;
         }
 
         public void OpenAfterReconstruction(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("'Name' argument is null!");
+            if (string.IsNullOrWhiteSpace(name)) throw new BadArgumentException("Argument is null!", "Hall name");
             this.Name = name;
-            if (!Reconstruction) throw new InvalidOperationException("Hall isn't on reconstruction now.");
+            if (!Reconstruction) throw new BadArgumentException("Hall isn't on reconstruction now.", $"HallId:{HallId}");
             this.Reconstruction = false;
         }
 
         public void AddOrChangeRow(char letter, int seats)
         {
+            letter = char.ToUpper(letter);
             var row = Rows.FirstOrDefault(r => r.Letter.Equals(letter));
             if (row == null)
                 Rows.Add(new Row(letter, seats));
@@ -56,16 +51,10 @@ namespace Domain.Models
 
         public void RemoveRow(char letter)
         {
-            if (!Char.IsLetter(letter)) throw new ArgumentException("'Letter' argument is not letter!");
-            Rows.RemoveAll(r => r.Letter.Equals(letter));
+            letter = char.ToUpper(letter);
+            if (!Char.IsLetter(letter)) throw new BadArgumentException("Argument is not a letter!", "Letter");
+            if(Rows.RemoveAll(r => r.Letter.Equals(letter)) < 1) throw new NotFoundException($"Row was not removed! '{letter}' is not exist", "Letter");;
         }
 
-        public class Json
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public bool Reconstruction { get; set; }
-            public IEnumerable<Row> Rows { get; set; }
-        }
     }
 }
