@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.DTOs;
+
 
 namespace Domain.Models
 {
@@ -14,36 +16,48 @@ namespace Domain.Models
         public List<Row> Rows { get; private set; }
 
         private Hall() { }
-        public Hall(Json hall)
+        public Hall(string name,List<Row> rows)
         {
-            Name = hall.Name;
-            Reconstruction = hall.Reconstruction;           
-            Rows = new List<Row>(hall.Rows);
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("'Name' argument is null!");
+            Name = name;
+            Reconstruction = false;
+            //if (rows.Count() == 0) throw new ArgumentNullException("Hall should contain one or more Rows!");
+            Rows = rows;
         }
+
+        //static public List<Dto_Hall> ToDtoList(List<Hall> halls)
+        //{
+        //    var dtos = new List<Dto_Hall>();
+        //    //halls.ForEach(dtos.Add)
+        //}
 
         public void CloseForReconstruction()
         {
-            this.Reconstruction = true;
+            if (Reconstruction) throw new InvalidOperationException("Hall is already on reconstruction.");
+            Reconstruction = true;
         }
 
-        public void OpenAfterReconstruction(Json hall)
+        public void OpenAfterReconstruction(string name)
         {
-            this.Name = hall.Name;
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("'Name' argument is null!");
+            this.Name = name;
+            if (!Reconstruction) throw new InvalidOperationException("Hall isn't on reconstruction now.");
             this.Reconstruction = false;
         }
 
-        public void AddOrChangeRow(Row row)
+        public void AddOrChangeRow(char letter, int seats)
         {
-            int rowIndex = Rows.FindIndex(r => r.Letter.Equals(row.Letter));
-            if (rowIndex < 0)
-                Rows.Add(row);
+            var row = Rows.FirstOrDefault(r => r.Letter.Equals(letter));
+            if (row == null)
+                Rows.Add(new Row(letter, seats));
             else
-                Rows[rowIndex].Seats = row.Seats;
+                row.SetSeats(seats);
         }
 
-        public void RemoveRow(Row row)
+        public void RemoveRow(char letter)
         {
-            Rows.RemoveAll(r => r.Letter.Equals(row.Letter));
+            if (!Char.IsLetter(letter)) throw new ArgumentException("'Letter' argument is not letter!");
+            Rows.RemoveAll(r => r.Letter.Equals(letter));
         }
 
         public class Json
