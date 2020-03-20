@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Exceptions;
+
 
 namespace Domain.Models
 {
@@ -14,44 +16,45 @@ namespace Domain.Models
         public List<Row> Rows { get; private set; }
 
         private Hall() { }
-        public Hall(Json hall)
+        public Hall(string name,List<Row> rows)
         {
-            Name = hall.Name;
-            Reconstruction = hall.Reconstruction;           
-            Rows = new List<Row>(hall.Rows);
+            if (string.IsNullOrWhiteSpace(name)) throw new BadArgumentException("Argument is null!","Hall name");
+            Name = name;
+            Reconstruction = false;
+            //if (rows.Count() == 0) throw new BadArgumentException("Hall should contain one or more Rows!","Rows");
+            Rows = rows;
         }
 
         public void CloseForReconstruction()
         {
-            this.Reconstruction = true;
+            if (Reconstruction) throw new BadArgumentException("Hall is already on reconstruction.", $"HallId:{HallId}");
+            Reconstruction = true;
         }
 
-        public void OpenAfterReconstruction(Json hall)
+        public void OpenAfterReconstruction(string name)
         {
-            this.Name = hall.Name;
+            if (string.IsNullOrWhiteSpace(name)) throw new BadArgumentException("Argument is null!", "Hall name");
+            this.Name = name;
+            if (!Reconstruction) throw new BadArgumentException("Hall isn't on reconstruction now.", $"HallId:{HallId}");
             this.Reconstruction = false;
         }
 
-        public void AddOrChangeRow(Row row)
+        public void AddOrChangeRow(char letter, int seats)
         {
-            int rowIndex = Rows.FindIndex(r => r.Letter.Equals(row.Letter));
-            if (rowIndex < 0)
-                Rows.Add(row);
+            letter = char.ToUpper(letter);
+            var row = Rows.FirstOrDefault(r => r.Letter.Equals(letter));
+            if (row == null)
+                Rows.Add(new Row(letter, seats));
             else
-                Rows[rowIndex].Seats = row.Seats;
+                row.SetSeats(seats);
         }
 
-        public void RemoveRow(Row row)
+        public void RemoveRow(char letter)
         {
-            Rows.RemoveAll(r => r.Letter.Equals(row.Letter));
+            letter = char.ToUpper(letter);
+            if (!Char.IsLetter(letter)) throw new BadArgumentException("Argument is not a letter!", "Letter");
+            if(Rows.RemoveAll(r => r.Letter.Equals(letter)) < 1) throw new NotFoundException($"Row was not removed! '{letter}' is not exist", "Letter");;
         }
 
-        public class Json
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public bool Reconstruction { get; set; }
-            public IEnumerable<Row> Rows { get; set; }
-        }
     }
 }

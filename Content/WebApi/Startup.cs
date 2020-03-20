@@ -9,7 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Domain.Models;
+using System.IO;
+using WebApi.Middlewares;
 
 namespace WebApi
 {
@@ -26,6 +29,12 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DomainContext>(opt => opt.UseInMemoryDatabase("DomainDb"));
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "WebApi.xml");
+                c.IncludeXmlComments(filePath);
+            });
             services.AddControllers();
         }
 
@@ -36,6 +45,12 @@ namespace WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi V1");
+            });
 
             app.UseHttpsRedirection();
 
@@ -43,6 +58,7 @@ namespace WebApi
 
             app.UseAuthorization();
 
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
