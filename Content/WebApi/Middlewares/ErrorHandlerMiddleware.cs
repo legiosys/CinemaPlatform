@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,11 +30,10 @@ namespace WebApi.Middlewares
         }
 
         private static Task HandleExceptionAsync(HttpContext context, ModelException ex)
-        {
-            var result = JsonConvert.SerializeObject(new { Error = ex.ToString() });
+        {           
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = ex.StatusCode;
-            return context.Response.WriteAsync(result);
+            return context.Response.WriteAsync(ex.ToString());
         }
     }
 }
