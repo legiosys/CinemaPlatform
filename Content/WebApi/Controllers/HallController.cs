@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
@@ -17,10 +18,12 @@ namespace WebApi.Controllers
     public class HallController : ControllerBase
     {
         private readonly DomainContext _context;
+        private readonly ILogger _logger;
 
-        public HallController(DomainContext context)
+        public HallController(DomainContext context, ILogger<HallController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>Creates new hall</summary>
@@ -45,7 +48,7 @@ namespace WebApi.Controllers
         [HttpPut]
         public async Task<int> PutHall(Dto_AddNew_Hall dtohall)
         {
-            
+            _logger.LogInformation($"Putting hall {dtohall.Name}");
             Hall hall = new Hall(dtohall.Name, Row.ToListFromDto(dtohall.Rows));
             _context.Halls.Add(hall);
             await _context.SaveChangesAsync();
@@ -62,6 +65,7 @@ namespace WebApi.Controllers
         [HttpGet("All")]
         public async Task<IEnumerable<Dto_Hall>> GetHalls()
         {
+            _logger.LogInformation("Getting all halls");
             var halls = await GetHallsWithDependencies();
             return halls.Select(h => CreateDtoHall(h));
         }
@@ -78,6 +82,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<Dto_Hall> GetHall(int id)
         {
+            _logger.LogInformation($"Getting hall with ID#{id}");
             var hall = await GetHallWithDependencies(id);
             return CreateDtoHall(hall);
         }
@@ -100,6 +105,7 @@ namespace WebApi.Controllers
         [HttpPost("ChangeRow")]
         public async Task<ActionResult<int>> AddOrChangeRow(Dto_AddEdit_Row row)
         {
+            _logger.LogInformation($"Changing hall#{row.HallId} row Letter:{row.Letter}, Seats:{row.Seats}");
             Hall hall = await GetHallWithDependencies(row.HallId);
             hall.AddOrChangeRow(row.Letter,row.Seats);
             await _context.SaveChangesAsync();
@@ -121,6 +127,7 @@ namespace WebApi.Controllers
         [HttpPost("RemoveRow")]
         public async Task<ActionResult<int>> RemoveRow(Dto_Remove_Row row)
         {
+            _logger.LogInformation($"Removing hall#{row.HallId} row Letter:{row.Letter}");
             Hall hall = await GetHallWithDependencies(row.HallId);
             hall.RemoveRow(row.Letter);
             await _context.SaveChangesAsync();
@@ -142,6 +149,7 @@ namespace WebApi.Controllers
         [HttpPost("CloseForReconstruction")]
         public async Task<ActionResult<int>> CloseForReconstruction(Dto_CloseForRec_Hall dtohall)
         {
+            _logger.LogInformation($"Closing hall#{dtohall.HallId} for reconstruction");
             Hall hall = await GetHallWithDependencies(dtohall.HallId);
             hall.CloseForReconstruction();
             await _context.SaveChangesAsync();
@@ -164,6 +172,7 @@ namespace WebApi.Controllers
         [HttpPost("OpenAfterReconstruction")]
         public async Task<ActionResult<int>> OpenAfterReconstruction(Dto_OpenAfterRec_Hall dtohall)
         {
+            _logger.LogInformation($"Opening hall#{dtohall.HallId} after reconstruction, new name:{dtohall.Name}");
             Hall hall = await GetHallWithDependencies(dtohall.HallId);
             hall.OpenAfterReconstruction(dtohall.Name);
             await _context.SaveChangesAsync();

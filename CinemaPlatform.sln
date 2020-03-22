@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "Content\WebApi\WebApi.csproj", "{BE506283-6D3E-46EA-83D4-22CA07B4B05B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Content\Domain\Domain.csproj", "{7715E0F9-F8E6-430D-95FA-D795E97E1DA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Content\Domain\Domain.csproj", "{7715E0F9-F8E6-430D-95FA-D795E97E1DA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

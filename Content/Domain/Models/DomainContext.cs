@@ -12,7 +12,8 @@ namespace Domain.Models
         public DbSet<Row> Rows { get; set; }
         public DomainContext(DbContextOptions<DomainContext> options)
             :base(options)
-        {            
+        {
+            Database.EnsureCreated();
         }       
     }
 }

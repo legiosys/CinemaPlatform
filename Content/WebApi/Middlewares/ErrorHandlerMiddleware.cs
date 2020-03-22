@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Domain.Exceptions;
 
 namespace WebApi.Middlewares
@@ -10,10 +11,12 @@ namespace WebApi.Middlewares
     public class ErrorHandlerMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger _logger;
 
-        public ErrorHandlerMiddleware(RequestDelegate next)
+        public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
         {
             this._next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -24,6 +27,7 @@ namespace WebApi.Middlewares
             }
             catch (ModelException ex)
             {
+                _logger.LogError($"Error: {ex}");
                 await HandleExceptionAsync(context, ex);
             }
 
