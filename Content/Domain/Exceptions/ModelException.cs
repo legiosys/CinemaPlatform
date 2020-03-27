@@ -9,20 +9,22 @@ namespace Domain.Exceptions
     {
         public string ArgumentName { get; set; }
         public int StatusCode { get; set; }
+        public string Method { get; set; }
 
         public override string ToString()
         {
-            return $"{Message} (Parameter: {ArgumentName})";
+            return $"{Message} At {Method} (Parameter: {ArgumentName})";
         }
 
-        public ModelException(string message, string argument) : base(message)
+        public ModelException(string message, string argument, string method) : base(message)
         {
             ArgumentName = argument;
+            Method = method;
         }
     }
     public class BadArgumentException : ModelException
     {
-        public BadArgumentException(string message, string argument) : base(message,argument)
+        public BadArgumentException(string message, string argument, string method) : base(message,argument, method)
         {
             StatusCode = (int)HttpStatusCode.BadRequest;
         }
@@ -30,7 +32,7 @@ namespace Domain.Exceptions
 
     public class NotFoundException : ModelException
     {
-        public NotFoundException(string message, string argument) : base(message, argument)
+        public NotFoundException(string message, string argument, string method) : base(message, argument, method)
         {
             StatusCode = (int)HttpStatusCode.NotFound;
         }

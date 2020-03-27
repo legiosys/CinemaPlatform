@@ -19,16 +19,16 @@ namespace Domain.Models
         private Row() { }
         public Row(char letter, int seats)
         {
-            if (!Char.IsLetter(letter)) throw new BadArgumentException("Argument is not a letter!", "Letter");
+            if (!Char.IsLetter(letter)) throw new BadArgumentException("Argument is not a letter!", $"Letter: {letter}", "Row Constructor");
             letter = char.ToUpper(letter);
             Letter = letter;
-            if (seats < 1) throw new BadArgumentException("Argument could not be less then 1!", "Seats");
+            if (seats < 1) throw new BadArgumentException("Argument could not be less then 1!", $"Seats:{seats}", "Row Constructor");
             Seats = seats;
         }
 
         public void SetSeats(int seats)
         {
-            if(seats < 1) throw new BadArgumentException("Argument could not be less then 1!", "Seats");
+            if(seats < 1) throw new BadArgumentException("Argument could not be less then 1!", $"Seats:{seats}", "SetSeats");
             this.Seats = seats;
         }
 

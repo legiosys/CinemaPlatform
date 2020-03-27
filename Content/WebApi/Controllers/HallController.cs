@@ -188,7 +188,7 @@ namespace WebApi.Controllers
         private async Task<Hall> GetHallWithDependencies(int id)
         {
             var hall = (await GetHallsWithDependencies()).FirstOrDefault(h => h.HallId == id);
-            if (hall == null ) throw new NotFoundException("Hall doesn't exist!", $"HallId:{id}");
+            if (hall == null ) throw new NotFoundException("Hall doesn't exist!", $"HallId:{id}", "GetHallWithDependencies");
             return hall;
         }
         
