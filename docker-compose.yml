@@ -5,8 +5,8 @@ services:
             context: .
             dockerfile: "Content/WebApi/Dockerfile"
         ports:
-            - "8000:8000"
-            - "4433:4433"
+            - "80:80"
+            - "443:443"
         depends_on:
             - db
     db:

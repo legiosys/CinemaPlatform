@@ -103,7 +103,7 @@ namespace WebApi.Controllers
         /// <response code="404">Hall with {HallId} not found</response>
         [HttpPost("AddRow")]
         [HttpPost("ChangeRow")]
-        public async Task<ActionResult<int>> AddOrChangeRow(Dto_AddEdit_Row row)
+        public async Task<IActionResult> AddOrChangeRow(Dto_AddEdit_Row row)
         {
             _logger.LogInformation($"Changing hall#{row.HallId} row Letter:{row.Letter}, Seats:{row.Seats}");
             Hall hall = await GetHallWithDependencies(row.HallId);
@@ -125,7 +125,7 @@ namespace WebApi.Controllers
         /// <response code="400">Bad input parameters</response>
         /// <response code="404">Hall with {HallId}  or Row{Letter} not found</response>
         [HttpPost("RemoveRow")]
-        public async Task<ActionResult<int>> RemoveRow(Dto_Remove_Row row)
+        public async Task<IActionResult> RemoveRow(Dto_Remove_Row row)
         {
             _logger.LogInformation($"Removing hall#{row.HallId} row Letter:{row.Letter}");
             Hall hall = await GetHallWithDependencies(row.HallId);
@@ -147,7 +147,7 @@ namespace WebApi.Controllers
         /// <response code="400">Bad input parameters</response>
         /// <response code="404">Hall with {HallId} not found</response>
         [HttpPost("CloseForReconstruction")]
-        public async Task<ActionResult<int>> CloseForReconstruction(Dto_CloseForRec_Hall dtohall)
+        public async Task<IActionResult> CloseForReconstruction(Dto_CloseForRec_Hall dtohall)
         {
             _logger.LogInformation($"Closing hall#{dtohall.HallId} for reconstruction");
             Hall hall = await GetHallWithDependencies(dtohall.HallId);
@@ -170,7 +170,7 @@ namespace WebApi.Controllers
         /// <response code="400">Bad input parameters</response>
         /// <response code="404">Hall with {HallId} not found</response>
         [HttpPost("OpenAfterReconstruction")]
-        public async Task<ActionResult<int>> OpenAfterReconstruction(Dto_OpenAfterRec_Hall dtohall)
+        public async Task<IActionResult> OpenAfterReconstruction(Dto_OpenAfterRec_Hall dtohall)
         {
             _logger.LogInformation($"Opening hall#{dtohall.HallId} after reconstruction, new name:{dtohall.Name}");
             Hall hall = await GetHallWithDependencies(dtohall.HallId);
@@ -188,7 +188,7 @@ namespace WebApi.Controllers
         private async Task<Hall> GetHallWithDependencies(int id)
         {
             var hall = (await GetHallsWithDependencies()).FirstOrDefault(h => h.HallId == id);
-            if (hall == null ) throw new NotFoundException("Hall doesn't exist!", $"HallId:{id}");
+            if (hall == null ) throw new NotFoundException("Hall doesn't exist!", $"HallId:{id}", "GetHallWithDependencies");
             return hall;
         }
         
