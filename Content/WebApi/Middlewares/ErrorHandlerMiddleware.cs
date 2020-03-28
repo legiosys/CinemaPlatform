@@ -28,7 +28,7 @@ namespace WebApi.Middlewares
             catch (ModelException ex)
             {
                 var request = context.Request;
-                _logger.LogError($"Error: {ex}, Request: {request.Path}");
+                _logger.LogError($"Error: {ex.ToLogString()}, Request: {request.Path}");
                 await HandleExceptionAsync(context, ex);
             }
 

@@ -11,9 +11,13 @@ namespace Domain.Exceptions
         public int StatusCode { get; set; }
         public string Method { get; set; }
 
-        public override string ToString()
+        public string ToLogString()
         {
             return $"{Message} At {Method} (Parameter: {ArgumentName})";
+        }
+        public override string ToString()
+        {
+            return $"{Message} (Parameter: {ArgumentName})";
         }
 
         public ModelException(string message, string argument, string method) : base(message)

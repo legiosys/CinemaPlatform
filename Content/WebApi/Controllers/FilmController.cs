@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Flurl;
+using Flurl.Http;
+using Domain.DTOs;
 using Domain.Models;
 using Domain.Exceptions;
 
@@ -16,11 +20,14 @@ namespace WebApi.Controllers
     [ApiController]
     public class FilmController : ControllerBase
     {
+        private const string APIKEY = "89ca9b02";
         private readonly DomainContext _context;
+        private readonly ILogger _logger;
 
-        public FilmController(DomainContext context)
+        public FilmController(DomainContext context, ILogger<HallController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>Shows all films</summary>
@@ -61,10 +68,9 @@ namespace WebApi.Controllers
         ///     
         /// </remarks>
         [HttpPost]
-        public async Task<ActionResult<Film>> PostFilm(Film film)
+        public async Task<ActionResult<Film>> PostFilm(Film postfilm)
         {
-            //if(film.ImdbId == null) throw BadArgumentException("Imdb")
-            CheckDates(film.StartDate, film.FinishDate);
+            var film = await ValidateFilm(postfilm, "POST");
             _context.Films.Add(film);
             await _context.SaveChangesAsync();
             return Ok();
@@ -86,15 +92,16 @@ namespace WebApi.Controllers
         public async Task<IActionResult> PutFilm(Film putfilm)
         {
             var film = await GetFilmById(putfilm.ImdbId);
-            CheckDates(putfilm.StartDate, putfilm.FinishDate);
             film.Name = putfilm.Name;
             film.Description = putfilm.Description;
             film.StartDate = putfilm.StartDate;
             film.FinishDate = putfilm.FinishDate;
+            film = await ValidateFilm(film, "PUT");
             _context.Entry(film).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok();
         }
+
 
         /// <summary>Patches values</summary>
         /// <remarks>Sample request: 
@@ -112,6 +119,8 @@ namespace WebApi.Controllers
         {
             var film = await GetFilmById(imdbid);
             patchFilm.ApplyTo(film);
+            film = await ValidateFilm(film,"PATCH");
+            _context.Entry(film).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -125,6 +134,7 @@ namespace WebApi.Controllers
         [HttpDelete("{imdbid}")]
         public async Task<ActionResult<Film>> DeleteFilm(string imdbid)
         {
+            _logger.LogInformation("DELETE: {0}", imdbid);
             var film = await GetFilmById(imdbid);
             _context.Films.Remove(film);
             await _context.SaveChangesAsync();
@@ -138,9 +148,28 @@ namespace WebApi.Controllers
             return film;
         }
 
-        private void CheckDates(DateTime start, DateTime finish)
+        private async Task<Film> CheckFilmOnImdb(Film film)
         {
-            if (start > finish) throw new BadArgumentException("Start Date should be earlier then finish!", $"Start: {start}, Finish: {finish}", "PostFilm");
+            var result = await "http://www.omdbapi.com"
+                .SetQueryParams(new { apikey = APIKEY, i = film.ImdbId })
+                .GetJsonAsync<Dto_ImdbFilm>();
+            _logger.LogInformation("imdb result: {0}", result.Title);
+            if (result.Title == null) throw new NotFoundException("Film doesn't exist on IMDB!", $"imdbID:{film.ImdbId}", "CheckFilmOnImdb");
+            film.Name ??= result.Title;
+            film.Description ??= result.Plot;
+            return film;
+        }
+
+        private async Task<Film> ValidateFilm (Film film, string method)
+        {
+            if (method.Equals("POST") || film.Name == null || film.Description == null)
+                film = await CheckFilmOnImdb(film);
+            _logger.LogInformation($"{method}: Changes to dbo.Films: imdbid: {film.ImdbId} \n" +
+                $"Name: {film.Name} \n Description: {film.Description} \n" +
+                $"StartDate: {film.StartDate} \n FinishDate: {film.FinishDate}");
+            if (film.StartDate > film.FinishDate) 
+                throw new BadArgumentException("Start Date should be earlier then finish!", $"Start: {film.StartDate}, Finish: {film.FinishDate}", "PostFilm");
+            return film;
         }
     }
 }
