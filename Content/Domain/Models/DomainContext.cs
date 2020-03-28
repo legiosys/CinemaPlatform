@@ -10,10 +10,18 @@ namespace Domain.Models
     {
         public DbSet<Hall> Halls { get; set; }
         public DbSet<Row> Rows { get; set; }
+        public DbSet<Film> Films { get; set; }
+
         public DomainContext(DbContextOptions<DomainContext> options)
             :base(options)
         {
-            Database.EnsureCreated();
-        }       
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Film>()
+                .HasIndex(f => f.ImdbId)
+                .IsUnique();
+        }
     }
 }
