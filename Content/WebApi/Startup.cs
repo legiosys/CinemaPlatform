@@ -14,6 +14,7 @@ using Microsoft.OpenApi.Models;
 using Domain.Models;
 using System.IO;
 using WebApi.Middlewares;
+using Films;
 
 namespace WebApi
 {
@@ -29,14 +30,16 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DomainContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("WebApi")));
-            //services.AddDbContext<DomainContext>(opt => opt.UseInMemoryDatabase("webapi"));
+            //services.AddDbContext<DomainContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("WebApi")));
+            services.AddDbContext<DomainContext>(opt => opt.UseInMemoryDatabase("webapi"));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
                 var filePath = Path.Combine(System.AppContext.BaseDirectory, "WebApi.xml");
                 c.IncludeXmlComments(filePath);
             });
+            services.AddTransient<IIMDB,OMDB>();
+            services.AddTransient<FilmService>();
             services.AddControllers().AddNewtonsoftJson();
         }
 
