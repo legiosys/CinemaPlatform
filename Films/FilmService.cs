@@ -8,18 +8,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.FilmLogic
+namespace Films
 {
-    public class FilmAdapter
+    public class FilmService
     {
         private readonly DomainContext _context;
         private readonly ILogger _logger;
-        private readonly Validator _validator;
-        public FilmAdapter(DomainContext context, ILogger<FilmAdapter> logger, Validator validator)
+        private readonly IIMDB _imdb;
+        public FilmService(DomainContext context, ILogger<FilmService> logger, IIMDB imdb)
         {
             _context = context;
             _logger = logger;
-            _validator = validator;
+            _imdb = imdb;
         }
 
         private async Task<Film> GetFilmById(string id)
@@ -28,6 +28,20 @@ namespace Domain.FilmLogic
             if (film == null) throw new NotFoundException("Film doesn't exist!", $"imdbID:{id}", "GetFilmById");
             return film;
         }
+        
+        private void Log(Film film,string method)
+        {
+            _logger.LogInformation($"{method}: Changes to dbo.Films: imdbid: {film.ImdbId} \n" +
+                $"Name: {film.Name} \n Description: {film.Description} \n" +
+                $"StartDate: {film.StartDate} \n FinishDate: {film.FinishDate}");
+        }
+
+        private async Task<Film> ImdbRequest(Film film)
+        {
+            var imdbfilm = await _imdb.GetFilmOnImdb(film.ImdbId);
+            return FilmFiller.Fill(film, imdbfilm);
+        }
+
         //Gets film by IMDB ID
         public async Task<Film> GetFilm(string imdbid)
         {
@@ -42,7 +56,9 @@ namespace Domain.FilmLogic
         //Adds new film to DB
         public async Task AddFilm(Film postfilm)
         {
-            var film = await _validator.Validate(postfilm, "POST");
+            var film = await ImdbRequest(postfilm);
+            Validator.Validate(film);
+            Log(film,"POST");
             _context.Films.Add(film);
             await _context.SaveChangesAsync();
         }
@@ -54,7 +70,10 @@ namespace Domain.FilmLogic
             film.Description = putfilm.Description;
             film.StartDate = putfilm.StartDate;
             film.FinishDate = putfilm.FinishDate;
-            film = await _validator.Validate(film, "PUT");
+            if (film.Name == null || film.Description == null)
+                film = await ImdbRequest(film);
+            Validator.Validate(film);
+            Log(film,"PUT");
             _context.Films.Update(film);
             await _context.SaveChangesAsync();
         }
@@ -63,7 +82,10 @@ namespace Domain.FilmLogic
         {
             var film = await GetFilmById(imdbid);
             patchFilm.ApplyTo(film);
-            film = await _validator.Validate(film, "PATCH");
+            if (film.Name == null || film.Description == null)
+                film = await ImdbRequest(film);
+            Validator.Validate(film);
+            Log(film,"PATCH");
             _context.Films.Update(film);
             await _context.SaveChangesAsync();
         }

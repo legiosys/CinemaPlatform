@@ -14,7 +14,7 @@ using Microsoft.OpenApi.Models;
 using Domain.Models;
 using System.IO;
 using WebApi.Middlewares;
-using Domain.FilmLogic;
+using Films;
 
 namespace WebApi
 {
@@ -38,9 +38,8 @@ namespace WebApi
                 var filePath = Path.Combine(System.AppContext.BaseDirectory, "WebApi.xml");
                 c.IncludeXmlComments(filePath);
             });
-            services.AddTransient<Validator>();
-            services.AddSingleton<IIMDB,OMDB>();
-            services.AddTransient<FilmAdapter>();
+            services.AddTransient<IIMDB,OMDB>();
+            services.AddTransient<FilmService>();
             services.AddControllers().AddNewtonsoftJson();
         }
 

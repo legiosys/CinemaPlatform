@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "Content\WebApi\We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Content\Domain\Domain.csproj", "{7715E0F9-F8E6-430D-95FA-D795E97E1DA2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Films", "Films\Films.csproj", "{577C48D8-D3F2-4700-A78E-009D27A2B40B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7715E0F9-F8E6-430D-95FA-D795E97E1DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7715E0F9-F8E6-430D-95FA-D795E97E1DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7715E0F9-F8E6-430D-95FA-D795E97E1DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{577C48D8-D3F2-4700-A78E-009D27A2B40B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{577C48D8-D3F2-4700-A78E-009D27A2B40B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{577C48D8-D3F2-4700-A78E-009D27A2B40B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{577C48D8-D3F2-4700-A78E-009D27A2B40B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

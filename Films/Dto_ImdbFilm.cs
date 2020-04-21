@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Domain.DTOs
+namespace Films
 {
     public class Dto_ImdbFilm
     {

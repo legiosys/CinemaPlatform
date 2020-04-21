@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
 using Domain.Models;
-using Domain.FilmLogic;
+using Films;
 
 namespace WebApi.Controllers
 {
@@ -15,9 +15,9 @@ namespace WebApi.Controllers
     [ApiController]
     public class FilmController : ControllerBase
     {
-        private FilmAdapter _films;
+        private FilmService _films;
 
-        public FilmController(FilmAdapter films)
+        public FilmController(FilmService films)
         {
             _films = films;
         }
